@@ -2,7 +2,44 @@
 # Assume Role
 # Get list of accounts
 # Write the list in CSV format to stdout (redirect as you see fit)
+
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+key="$1"
+ 
+case $key in
+    -r|--role)
+    ROLEARN="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -o|--orgunit)
+    ORGUNIT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    *)    # unknown option
+    echo "Unknown Option"
+    exit 9
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+# TEMP - static role for testing.
 ROLEARN=arn:aws:iam::948143805254:role/thcp/privilegedservice/AWSFoundationsBootstrappingRole
+#
+if [[ -z $ORGUNIT ]]
+then 
+  echo "Using Root OU"
+  ORGUNIT=Root 
+else 
+  echo "Using OU: ${ORGUNIT}"
+fi 
+
 temp_role=$(aws sts assume-role --role-arn ${ROLEARN} --role-session-name organizations-securityhub)
 export AWS_ACCESS_KEY_ID=$(echo $temp_role | jq .Credentials.AccessKeyId | xargs)
 export AWS_SECRET_ACCESS_KEY=$(echo $temp_role | jq .Credentials.SecretAccessKey | xargs)
