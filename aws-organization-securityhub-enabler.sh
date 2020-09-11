@@ -57,7 +57,7 @@ ROOTID=$(aws organizations list-roots --query 'Roots[?Name.Value==Root].Id' --ou
 echo "My RootId=$ROOTID"
 
 echo "Listing Children:"
-if [[ ]]
+
 aws organizations list-children --parent-id ${ORGUNIT} --child-type ${CHILDTYPE}
 
 #echo "Listing Accounts"
